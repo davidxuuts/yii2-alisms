@@ -70,7 +70,6 @@ class Credential
 	public function getAccessKeyId()
 	{
 		return $this->accessKeyId;
-		return $this->accessKeyId;
 	}
 	
 	public function setAccessKeyId($accessKeyId)

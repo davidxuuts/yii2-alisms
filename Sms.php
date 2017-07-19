@@ -8,11 +8,65 @@
 namespace davidxu\alisms;
 
 use davidxu\alisms\profile\DefaultProfile;
+use davidxu\alisms\regions\Endpoint;
+use davidxu\alisms\regions\EndpointProvider;
+use davidxu\alisms\regions\ProductDomain;
 use davidxu\alisms\request\QuerySendDetailsRequest;
 use davidxu\alisms\request\SendSmsRequest;
 
 class Sms
 {
+    public function __construct()
+    {
+        $endpoint_filename = dirname(__FILE__) . DIRECTORY_SEPARATOR
+            . 'regions' . DIRECTORY_SEPARATOR . 'endpoints.xml';
+        $xml = simplexml_load_string(file_get_contents($endpoint_filename));
+        $json = json_encode($xml);
+        $jsonArray = json_decode($json, TRUE);
+        $endpoints = array();
+
+        foreach ($jsonArray["Endpoint"] as $json_endpoint) {
+            # pre-process RegionId & Product
+            if (!array_key_exists("RegionId", $json_endpoint["RegionIds"])) {
+                $region_ids = array();
+            } else {
+                $json_region_ids = $json_endpoint['RegionIds']['RegionId'];
+                if (!is_array($json_region_ids)) {
+                    $region_ids = array($json_region_ids);
+                } else {
+                    $region_ids = $json_region_ids;
+                }
+            }
+
+            if (!array_key_exists("Product", $json_endpoint["Products"])) {
+                $products = array();
+
+            } else {
+                $json_products = $json_endpoint["Products"]["Product"];
+
+                if (array() === $json_products or !is_array($json_products)) {
+                    $products = array();
+                } else if (array_keys($json_products) !== range(0, count($json_products) - 1)) {
+                    # array is not sequential
+                    $products = array($json_products);
+                } else {
+                    $products = $json_products;
+                }
+            }
+
+            $product_domains = array();
+            foreach ($products as $product) {
+                $product_domain = new ProductDomain($product['ProductName'], $product['DomainName']);
+                array_push($product_domains, $product_domain);
+            }
+
+            $endpoint = new Endpoint($region_ids[0], $region_ids, $product_domains);
+            array_push($endpoints, $endpoint);
+        }
+
+        EndpointProvider::setEndpoints($endpoints);
+    }
+
     public $accessKeyId;
     public $accessKeySecret;
     public $product = 'Dysmsapi';
@@ -27,7 +81,7 @@ class Sms
      * @param string $outId
      * @return mixed|\SimpleXMLElement
      */
-    public function sendSms($templateCode, $phoneNumbers, $templateParams, $outId) {
+    public function sendSms($templateCode, $phoneNumbers, $templateParams = [], $outId = '') {
         //初始化访问的acsCleint
         $profile = DefaultProfile::getProfile($this->region, $this->accessKeyId, $this->accessKeySecret);
         DefaultProfile::addEndpoint($this->region, $this->region, $this->product, $this->domain);
@@ -46,7 +100,7 @@ class Sms
         $request->setTemplateCode($templateCode);
 
         //选填-假如模板中存在变量需要替换则为必填(JSON格式)
-        if (is_array($templateParams)) {
+        if (is_array($templateParams) && $templateParams) {
             $request->setTemplateParam(json_encode($templateParams));
         }
 
@@ -74,7 +128,7 @@ class Sms
         //初始化访问的acsCleint
         $profile = DefaultProfile::getProfile($this->region, $this->accessKeyId, $this->accessKeySecret);
         DefaultProfile::addEndpoint($this->region, $this->region, $this->product, $this->domain);
-        $acsClient= new DefaultAcsClient($profile);
+        $acsClient = new DefaultAcsClient($profile);
 
         $request = new QuerySendDetailsRequest();
 
@@ -82,13 +136,17 @@ class Sms
         $request->setPhoneNumber($phoneNumber);
 
         //选填-短信发送流水号
-        $request->setBizId($bizId);
+        if ($bizId) {
+            $request->setBizId($bizId);
+        }
+
         //必填-短信发送日期，支持近30天记录查询，格式yyyyMMdd
 
         $request->setSendDate($date);
         $request->setPageSize($pageSize);
         //必填-当前页码
-        $request->setContent($page);
+        $request->setCurrentPage($page);
+//        $request->setContent($page);
 
         //发起访问请求
         $acsResponse = $acsClient->getAcsResponse($request);

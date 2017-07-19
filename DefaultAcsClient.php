@@ -6,7 +6,7 @@
  * Time: 5:59 PM
  */
 
-/*
+/**
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -27,12 +27,20 @@
 
 namespace davidxu\alisms;
 
+use davidxu\alisms\auth\Credential;
+use davidxu\alisms\auth\ISigner;
 use davidxu\alisms\exception\ClientException;
 use davidxu\alisms\exception\ServerException;
 use davidxu\alisms\http\HttpHelper;
+use davidxu\alisms\profile\IClientProfile;
+use davidxu\alisms\regions\EndpointProvider;
+use davidxu\alisms\request\QuerySendDetailsRequest;
 
 class DefaultAcsClient implements IAcsClient
 {
+    /**
+     * @var IClientProfile $iClientProfile
+     */
     public $iClientProfile;
     public $__urlTestFlag__;
 
@@ -42,6 +50,14 @@ class DefaultAcsClient implements IAcsClient
         $this->__urlTestFlag__ = false;
     }
 
+    /**
+     * @param QuerySendDetailsRequest $request
+     * @param null $iSigner
+     * @param null $credential
+     * @param bool $autoRetry
+     * @param int $maxRetryNumber
+     * @return mixed|\SimpleXMLElement
+     */
     public function getAcsResponse($request, $iSigner = null, $credential = null, $autoRetry = true, $maxRetryNumber = 3)
     {
         $httpResponse = $this->doActionImpl($request, $iSigner, $credential, $autoRetry, $maxRetryNumber);
@@ -53,6 +69,15 @@ class DefaultAcsClient implements IAcsClient
         return $respObject;
     }
 
+    /**
+     * @param QuerySendDetailsRequest $request
+     * @param ISigner $iSigner
+     * @param Credential $credential
+     * @param bool $autoRetry
+     * @param int $maxRetryNumber
+     * @return http\HttpResponse
+     * @throws ClientException
+     */
     private function doActionImpl($request, $iSigner = null, $credential = null, $autoRetry = true, $maxRetryNumber = 3)
     {
         if(null == $this->iClientProfile && (null == $iSigner || null == $credential
@@ -80,7 +105,7 @@ class DefaultAcsClient implements IAcsClient
             throw new ClientException($requestUrl, "URLTestFlagIsSet");
         }
 
-        if(count($request->getDomainParameter())>0){
+        if (count($request->getDomainParameter()) > 0) {
             $httpResponse = HttpHelper::curl($requestUrl, $request->getMethod(), $request->getDomainParameter(), $request->getHeaders());
         } else {
             $httpResponse = HttpHelper::curl($requestUrl, $request->getMethod(),$request->getContent(), $request->getHeaders());
@@ -106,6 +131,10 @@ class DefaultAcsClient implements IAcsClient
         return $this->doActionImpl($request, $iSigner, $credential, $autoRetry, $maxRetryNumber);
     }
 
+    /**
+     * @param \davidxu\alisms\AcsRequest $request
+     * @return mixed
+     */
     private function prepareRequest($request)
     {
         if(null == $request->getRegionId())
@@ -131,6 +160,7 @@ class DefaultAcsClient implements IAcsClient
 
     private function parseAcsResponse($body, $format)
     {
+        $respObject = array();
         if ("JSON" == $format)
         {
             $respObject = json_decode($body);

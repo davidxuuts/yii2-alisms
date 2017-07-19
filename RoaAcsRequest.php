@@ -54,30 +54,30 @@ abstract class RoaAcsRequest extends AcsRequest
     {
         $this->prepareHeader($iSigner);
 
-        $signString = $this->getMethod().self::$headerSeparator;
+        $signString = $this->getMethod() . self::$headerSeparator;
         if(isset($this->headers["Accept"]))
         {
             $signString = $signString.$this->headers["Accept"];
         }
-        $signString = $signString.self::$headerSeparator;
+        $signString = $signString . self::$headerSeparator;
 
         if(isset($this->headers["Content-MD5"]))
         {
-            $signString = $signString.$this->headers["Content-MD5"];
+            $signString = $signString . $this->headers["Content-MD5"];
         }
-        $signString = $signString.self::$headerSeparator;
+        $signString = $signString . self::$headerSeparator;
 
         if(isset($this->headers["Content-Type"]))
         {
-            $signString = $signString.$this->headers["Content-Type"];
+            $signString = $signString . $this->headers["Content-Type"];
         }
-        $signString = $signString.self::$headerSeparator;
+        $signString = $signString . self::$headerSeparator;
 
         if(isset($this->headers["Date"]))
         {
-            $signString = $signString.$this->headers["Date"];
+            $signString = $signString . $this->headers["Date"];
         }
-        $signString = $signString.self::$headerSeparator;
+        $signString = $signString . self::$headerSeparator;
 
         $uri = $this->replaceOccupiedParameters();
         $signString = $signString.$this->buildCanonicalHeaders();
@@ -89,9 +89,9 @@ abstract class RoaAcsRequest extends AcsRequest
         /**
          * @var ISigner $iSigner
          */
-        $this->headers["Authorization"] = "acs ". $credential->getAccessKeyId().":"
-            .$iSigner->signString($signString, $credential->getAccessSecret());
-        $requestUrl = $this->getProtocol()."://".$domain.$queryString;
+        $this->headers["Authorization"] = "acs " . $credential->getAccessKeyId() . ":"
+            . $iSigner->signString($signString, $credential->getAccessSecret());
+        $requestUrl = $this->getProtocol() . "://" . $domain . $queryString;
         return $requestUrl;
     }
 
@@ -122,8 +122,8 @@ abstract class RoaAcsRequest extends AcsRequest
         $result = $this->uriPattern;
         foreach ($this->pathParameters as $pathParameterKey => $apiParameterValue)
         {
-            $target = "[".$pathParameterKey."]";
-            $result = str_replace($target,$apiParameterValue,$result);
+            $target = "[" . $pathParameterKey . "]";
+            $result = str_replace($target, $apiParameterValue, $result);
         }
         return $result;
     }
@@ -143,7 +143,7 @@ abstract class RoaAcsRequest extends AcsRequest
         $headerString = "";
         foreach ($sortMap as $sortMapKey => $sortMapValue)
         {
-            $headerString = $headerString.$sortMapKey.":".$sortMapValue.self::$headerSeparator;
+            $headerString = $headerString . $sortMapKey . ":" . $sortMapValue . self::$headerSeparator;
         }
         return $headerString;
     }
@@ -175,21 +175,21 @@ abstract class RoaAcsRequest extends AcsRequest
         $queryString = $uriParts[0];
         if(count($uriParts))
         {
-            $queryString = $queryString."?";
+            $queryString = $queryString . "?";
         }
         ksort($sortMap);
         foreach ($sortMap as $sortMapKey => $sortMapValue)
         {
-            $queryString = $queryString.$sortMapKey;
+            $queryString = $queryString . $sortMapKey;
             if(isset($sortMapValue))
             {
-                $queryString = $queryString."=".$sortMapValue;
+                $queryString = $queryString . "=" . $sortMapValue;
             }
-            $queryString = $queryString.$querySeprator;
+            $queryString = $queryString . self::$querySeprator;
         }
-        if(null==count($sortMap))
+        if(null == count($sortMap))
         {
-            $queryString = substr($queryString, 0, strlen($queryString)-1);
+            $queryString = substr($queryString, 0, strlen($queryString) - 1);
         }
         return $queryString;
     }

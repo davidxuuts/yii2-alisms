@@ -53,7 +53,7 @@ class QueryInterSmsIsoInfoRequest extends RpcAcsRequest
 
 	public function setCountryName($countryName) {
 		$this->countryName = $countryName;
-		$this->queryParameters["CountryName"]=$countryName;
+		$this->queryParameters["CountryName"] = $countryName;
 	}
 
 	public function getResourceOwnerId() {
@@ -62,7 +62,7 @@ class QueryInterSmsIsoInfoRequest extends RpcAcsRequest
 
 	public function setResourceOwnerId($resourceOwnerId) {
 		$this->resourceOwnerId = $resourceOwnerId;
-		$this->queryParameters["ResourceOwnerId"]=$resourceOwnerId;
+		$this->queryParameters["ResourceOwnerId"] = $resourceOwnerId;
 	}
 
 	public function getOwnerId() {
@@ -71,7 +71,7 @@ class QueryInterSmsIsoInfoRequest extends RpcAcsRequest
 
 	public function setOwnerId($ownerId) {
 		$this->ownerId = $ownerId;
-		$this->queryParameters["OwnerId"]=$ownerId;
+		$this->queryParameters["OwnerId"] = $ownerId;
 	}
 	
 }

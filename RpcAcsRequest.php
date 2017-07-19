@@ -92,17 +92,17 @@ abstract class RpcAcsRequest extends AcsRequest
         $apiParams["Action"] = $this->getActionName();
         $apiParams["Version"] = $this->getVersion();
         $apiParams["Signature"] = $this->computeSignature($apiParams, $credential->getAccessSecret(), $iSigner);
-        if(parent::getMethod() == "POST") {
 
-            $requestUrl = $this->getProtocol()."://". $domain . "/";
+        if(parent::getMethod() == "POST") {
+            $requestUrl = $this->getProtocol() . "://" . $domain . "/";
             foreach ($apiParams as $apiParamKey => $apiParamValue)
             {
-                $this->putDomainParameters($apiParamKey,$apiParamValue);
+                $this->putDomainParameters($apiParamKey, $apiParamValue);
             }
             return $requestUrl;
         }
         else {
-            $requestUrl = $this->getProtocol()."://". $domain . "/?";
+            $requestUrl = $this->getProtocol() . "://". $domain . "/?";
 
             foreach ($apiParams as $apiParamKey => $apiParamValue)
             {
@@ -118,13 +118,13 @@ abstract class RpcAcsRequest extends AcsRequest
         $canonicalizedQueryString = '';
         foreach($parameters as $key => $value)
         {
-            $canonicalizedQueryString .= '&' . $this->percentEncode($key). '=' . $this->percentEncode($value);
+            $canonicalizedQueryString .= '&' . $this->percentEncode($key) . '=' . $this->percentEncode($value);
         }
 
         /**
          * @var ISigner $iSigner
          */
-        $stringToSign = parent::getMethod().'&%2F&' . $this->percentencode(substr($canonicalizedQueryString, 1));
+        $stringToSign = parent::getMethod() . '&%2F&' . $this->percentencode(substr($canonicalizedQueryString, 1));
         $signature = $iSigner->signString($stringToSign, $accessKeySecret."&");
 
         return $signature;

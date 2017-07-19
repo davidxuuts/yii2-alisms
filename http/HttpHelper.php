@@ -28,10 +28,18 @@ class HttpHelper
 	const HTTP_PROXY_IP = '127.0.0.1';
 	const HTTP_PROXY_PORT = '8888';
 
-    public static $connectTimeout = 30;//30 second
-	public static $readTimeout = 80;//80 second
-	
-	public static function curl($url, $httpMethod = "GET", $postFields = null,$headers = null)
+    public static $connectTimeout = 30; //30 second
+	public static $readTimeout = 80; //80 second
+
+    /**
+     * @param string $url
+     * @param string $httpMethod
+     * @param string $postFields
+     * @param string $headers
+     * @return HttpResponse
+     * @throws ClientException
+     */
+    public static function curl($url, $httpMethod = 'GET', $postFields = null, $headers = null)
 	{
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod); 
