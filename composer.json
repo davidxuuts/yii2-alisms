@@ -1,0 +1,21 @@
+{
+    "name": "davidxu/yii2-alisms",
+    "description": "An Aliyun Short Message Library Package",
+    "type": "library",
+    "keywords": ["yii2","extension"," aliyun sms"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Xu",
+            "email": "david.xu.uts@163.com"
+        }
+    ],
+    "require": {
+        "php": ">5.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "davidxu\\alisms\\": ""
+        }
+    }
+}
