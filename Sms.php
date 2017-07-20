@@ -40,7 +40,6 @@ class Sms
 
             if (!array_key_exists("Product", $json_endpoint["Products"])) {
                 $products = array();
-
             } else {
                 $json_products = $json_endpoint["Products"]["Product"];
 
@@ -69,10 +68,10 @@ class Sms
 
     public $accessKeyId;
     public $accessKeySecret;
+    public $signName;
     public $product = 'Dysmsapi';
     public $domain = 'dysmsapi.aliyuncs.com';
     public $region = 'cn-hangzhou';
-    public $signName;
 
     /**
      * @param string $templateCode
@@ -125,11 +124,11 @@ class Sms
      */
     public function querySendDetails($phoneNumber, $date, $bizId = '', $pageSize = 10, $page = 1) {
 
-        //初始化访问的acsCleint
+        //初始化访问的acsClient
         $profile = DefaultProfile::getProfile($this->region, $this->accessKeyId, $this->accessKeySecret);
         DefaultProfile::addEndpoint($this->region, $this->region, $this->product, $this->domain);
-        $acsClient = new DefaultAcsClient($profile);
 
+        $acsClient = new DefaultAcsClient($profile);
         $request = new QuerySendDetailsRequest();
 
         //必填-短信接收号码
@@ -147,7 +146,6 @@ class Sms
         //必填-当前页码
         $request->setCurrentPage($page);
 //        $request->setContent($page);
-
         //发起访问请求
         $acsResponse = $acsClient->getAcsResponse($request);
 

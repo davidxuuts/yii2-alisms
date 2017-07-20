@@ -51,7 +51,7 @@ class DefaultAcsClient implements IAcsClient
     }
 
     /**
-     * @param QuerySendDetailsRequest $request
+     * @param AcsRequest $request
      * @param null $iSigner
      * @param null $credential
      * @param bool $autoRetry
@@ -97,7 +97,8 @@ class DefaultAcsClient implements IAcsClient
         $domain = EndpointProvider::findProductDomain($request->getRegionId(), $request->getProduct());
         if(null == $domain)
         {
-            throw new ClientException("Can not find endpoint to access.", "SDK.InvalidRegionId");
+            $domain = 'dysmsapi.aliyuncs.com';
+//            throw new ClientException("Can not find endpoint to access.", "SDK.InvalidRegionId");
         }
         $requestUrl = $request->composeUrl($iSigner, $credential, $domain);
 
